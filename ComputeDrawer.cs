@@ -27,9 +27,6 @@ public class ComputeDrawer : MonoBehaviour
     public Color targetMainColour;
     public Color targetSecondaryColour;
 
-    public Gradient colourGradient;
-    public RenderTexture gradientTexture;
-
     [Range(1, 1920)] public int width;
     [Range(1, 1080)] public int height;
 
@@ -78,32 +75,6 @@ public class ComputeDrawer : MonoBehaviour
         _texture.wrapMode = TextureWrapMode.Clamp;
 
         _texture.Create();
-    }
-
-    public void CreateGradient()
-    {
-        gradientTexture = new RenderTexture(
-            width, 1, 0, RenderTextureFormat.ARGBFloat,
-            RenderTextureReadWrite.Linear
-        );
-
-        gradientTexture.enableRandomWrite = true;
-        gradientTexture.autoGenerateMips = false;
-
-        gradientTexture.filterMode = FilterMode.Point;
-        gradientTexture.wrapMode = TextureWrapMode.Clamp;
-
-        Texture2D gradientTexture_ = new Texture2D(width, 1);
-        for(int x = 0; x < width; x ++)
-        {
-            float t = ((float)x) / width;
-            Color colour = colourGradient.Evaluate(t);
-
-            gradientTexture_.SetPixel(x, 0, colour);
-        }
-
-        gradientTexture_.Apply();
-        Graphics.Blit(gradientTexture_, gradientTexture);
     }
 
     void Update()
@@ -163,8 +134,6 @@ public class ComputeDrawer : MonoBehaviour
             secondaryColour.b / maxColourValue,
             1
         ));
-
-        _shader.SetTexture(0, "GradietTex", gradientTexture);
     }
 
     void RunCompute()
@@ -201,24 +170,11 @@ public class ComputeDrawer : MonoBehaviour
                 InitRenderTexture();
             }
 
-            if(gradientTexture == null)
-            {
-                CreateGradient();
-            }
-
             RunCompute();
 
             Graphics.Blit(_texture, dest);
         } catch(System.Exception err){
-            Debug.Log("Got error in ONRENDERIMAGE");
-            if(_texture == null)
-            {
-                Debug.Log("_TEXTURE IS NULL");
-            }
-            if(gradientTexture == null)
-            {
-                Debug.Log("GRADIENT TEXTURE IS NULL");
-            }
+
         }
     }
 
