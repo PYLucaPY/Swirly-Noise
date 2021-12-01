@@ -36,11 +36,13 @@ public class ComputeDrawer : MonoBehaviour
     private Vector3 mainColourVelocity;
     private Vector3 secondaryColourVelocity;
 
+    private float startingBaseFreq;
+
     Color GetMainColourTarget()
     {
         return Random.ColorHSV(
             0, 1,
-            1, 0.75f,
+            0.6f,1,
             1, 1,
             0, 1 
         );
@@ -50,7 +52,7 @@ public class ComputeDrawer : MonoBehaviour
     {
         return Random.ColorHSV(
             0, 1,
-            1, 0.75f,
+            0.6f,1,
             1, 1,
             0, 1 
         );
@@ -59,6 +61,8 @@ public class ComputeDrawer : MonoBehaviour
     private void Start() {
         targetMainColour = GetMainColourTarget();
         targetSecondaryColour = GetSecondaryColourTarget();
+
+        startingBaseFreq = baseFrequency;
     }
 
     void InitRenderTexture()
@@ -79,7 +83,23 @@ public class ComputeDrawer : MonoBehaviour
 
     void Update()
     {
-        baseFrequency += Mathf.Sin(Time.frameCount * screenSinSpeed) * screenSinMag;
+        baseFrequency = startingBaseFreq + (
+            Mathf.Sin(
+                Time.frameCount * screenSinSpeed
+            ) * screenSinMag * (scrollSpeed / 0.05f)
+        );
+
+        if(Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.P))
+        {
+            scrollSpeed += 0.01f;
+        }
+
+        if(Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.O))
+        {
+            scrollSpeed -= 0.01f;
+        }
+
+        scrollSpeed = Mathf.Min(0, scrollSpeed);
 
         if(Time.frameCount % 200 == 0 && !(Time.frameCount % 400 == 0))
         {
