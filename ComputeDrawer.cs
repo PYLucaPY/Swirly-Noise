@@ -86,7 +86,9 @@ public class ComputeDrawer : MonoBehaviour
         baseFrequency = startingBaseFreq + (
             Mathf.Sin(
                 Time.frameCount * screenSinSpeed
-            ) * screenSinMag * (scrollSpeed / 0.05f)
+            ) * screenSinMag * (Mathf.Clamp (
+                scrollSpeed, 0, 0.5f
+            ) / 0.05f)
         );
 
         if(Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.P))
