@@ -99,7 +99,7 @@ public class ComputeDrawer : MonoBehaviour
             scrollSpeed -= 0.01f;
         }
 
-        scrollSpeed = Mathf.Min(0, scrollSpeed);
+        scrollSpeed = Mathf.Max(0, scrollSpeed);
 
         if(Time.frameCount % 200 == 0 && !(Time.frameCount % 400 == 0))
         {
