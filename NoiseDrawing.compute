@@ -235,14 +235,6 @@ float BlurPoint(float3 samplePoint)
     return (p * 2 + p0 + p1 + p2 + p3) / 5;
 }
 
-float4 GetGradient(float perlinV)
-{
-    uint xCoord = (uint) (width * perlinV);
-    uint2 gradientCoords = uint2(xCoord, 0);
-
-    return GradietTex[gradientCoords];
-}
-
 [numthreads(8,8,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
@@ -253,34 +245,27 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
     float p = BlurPoint(samplePoint);
 
-    bool useGradient = false;
+    float4 col = mainColour;
+    float4 scol = secondaryColour;
 
-    if(useGradient) {
-        Result[id.xy] = GetGradient(p);
-    }
-    else {
-        float4 col = mainColour;
-        float4 scol = secondaryColour;
+    col = lerp(col, scol, clamp(p,0,1));
 
-        col = lerp(col, scol, clamp(p,0,1));
+    col *= clamp(
+        perlin((samplePoint + totalTime * 0.4f) * 0.7f),
+        0.4f,
+        1
+    );
 
-        col *= clamp(
-            perlin((samplePoint + totalTime * 0.4f) * 0.7f),
-            0.4f,
-            1
-        );
+    scol *= clamp(
+        perlin((samplePoint + totalTime * 0.4f) * 0.7f),
+        0.4f,
+        1
+    );
 
-        scol *= clamp(
-            perlin((samplePoint + totalTime * 0.4f) * 0.7f),
-            0.4f,
-            1
-        );
+    float4 regularCol = float4(ShadeColour(samplePoint + totalTime * 0.3f,
+        col,scol),1);
 
-        float4 regularCol = float4(ShadeColour(samplePoint + totalTime * 0.3f,
-            col,scol),1);
-
-        col = regularCol;
-        
-        Result[id.xy] = p * col;
-    }
+    col = regularCol;
+    
+    Result[id.xy] = p * col;
 }
