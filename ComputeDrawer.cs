@@ -83,12 +83,22 @@ public class ComputeDrawer : MonoBehaviour
 
     void Update()
     {
+        float bfSinStep = Time.frameCount * screenSinSpeed;
+
+        float bfSinPart = Mathf.Sin(
+            bfSinStep
+        );
+
+        float sinScrollMult = Mathf.Clamp (
+                scrollSpeed, 0, 0.05f
+            ) / 0.05f;
+
+        float sinMult =  screenSinMag * sinScrollMult;
+
+        bfSinPart *= sinMult;
+
         baseFrequency = startingBaseFreq + (
-            Mathf.Sin(
-                Time.frameCount * screenSinSpeed
-            ) * screenSinMag * (Mathf.Clamp (
-                scrollSpeed, 0, 0.5f
-            ) / 0.05f)
+            bfSinPart
         );
 
         if(Input.GetKey(KeyCode.LeftShift) && Input.GetKeyDown(KeyCode.P))
